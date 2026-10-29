@@ -49,7 +49,7 @@ export default function Bmi() {
       {/* ส่วนลิงค์กลับไปหน้าหลัก */}
       <Link to="/" className="w-full bg-gray-400 mt-3 p-2 rounded-md
                     text-black font-kanit font-bold text-center
-                    hover:bg-gray-500">
+                    hover:bg-gray-500 ">
       กลับหน้าหลัก
       </Link>
 
