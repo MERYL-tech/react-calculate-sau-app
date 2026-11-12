@@ -8,7 +8,7 @@ import Bmr from "./../assets/bmr.png";
 
 import Bmi from "./../assets/bmi.png";
 import { Link } from "react-router-dom";
-import Foodter from "../components/Foodter";
+import Footer from "../components/Footer";
 
 export default function Home() {
   return (
@@ -47,7 +47,7 @@ export default function Home() {
         </div>
 
         {/* foodter */}
-        <Foodter />
+        <Footer />
       </div>
     </>
   );

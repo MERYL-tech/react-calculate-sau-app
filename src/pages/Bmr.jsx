@@ -1,33 +1,66 @@
 import { useState } from "react";
 import bmrImg from "../assets/bmr.png"; // เปลี่ยนเป็น path รูปภาพของคุณ
 import { Link } from "react-router-dom";
+import Footer from "../components/Footer";
+import Swal from "sweetalert2";
 
 export default function Bmr() {
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("male");
-  const [bmr, setBmr] = useState(0);
+  const [bmr, setBmr] = useState("0.00");
 
   const calculateBmr = (e) => {
     e.preventDefault();
+
     const w = parseFloat(weight);
     const h = parseFloat(height);
     const a = parseFloat(age);
 
-    if (w > 0 && h > 0 && a > 0) {
-      let bmrValue = 0;
-
-      if (gender === "male") {
-        // สูตรผู้ชาย: BMR = 66 + (13.7 x weight) + (5 x height) - (6.8 x age)
-        bmrValue = 66 + 13.7 * w + 5 * h - 6.8 * a;
-      } else {
-        // สูตรผู้หญิง: BMR = 665 + (9.6 x weight) + (1.8 x height) - (4.7 x age)
-        bmrValue = 665 + 9.6 * w + 1.8 * h - 4.7 * a;
-      }
-
-      setBmr(bmrValue.toFixed(2));
+    // ตรวจสอบว่ากรอกข้อมูลครบและถูกต้องหรือไม่
+    if (
+      !weight.trim() ||
+      !height.trim() ||
+      !age.trim() ||
+      isNaN(w) ||
+      isNaN(h) ||
+      isNaN(a) ||
+      w <= 0 ||
+      h <= 0 ||
+      a <= 0
+    ) {
+      Swal.fire({
+        icon: "warning",
+        title: "กรุณากรอกข้อมูลให้ครบถ้วน",
+        text: "โปรดระบุน้ำหนัก ส่วนสูง และอายุให้ถูกต้อง",
+        confirmButtonText: "ตกลง",
+        confirmButtonColor: "#4f46e5",
+      });
+      return;
     }
+
+    let bmrValue = 0;
+
+    if (gender === "male") {
+      // สูตรผู้ชาย: BMR = 66 + (13.7 x weight) + (5 x height) - (6.8 x age)
+      bmrValue = 66 + 13.7 * w + 5 * h - 6.8 * a;
+    } else {
+      // สูตรผู้หญิง: BMR = 665 + (9.6 x weight) + (1.8 x height) - (4.7 x age)
+      bmrValue = 665 + 9.6 * w + 1.8 * h - 4.7 * a;
+    }
+
+    const formattedBmr = bmrValue.toFixed(2);
+    setBmr(formattedBmr);
+
+    // แจ้งเตือนเมื่อกรอกข้อมูลและคำนวณเสร็จสิ้น
+    Swal.fire({
+      icon: "success",
+      title: "คำนวณ BMR สำเร็จ!",
+      html: `พลังงานพื้นฐานที่ร่างกายต้องการคือ<br/><b>${formattedBmr} kcal/day</b>`,
+      confirmButtonText: "ตกลง",
+      confirmButtonColor: "#4f46e5",
+    });
   };
 
   const handleReset = () => {
@@ -35,14 +68,18 @@ export default function Bmr() {
     setHeight("");
     setAge("");
     setGender("male");
-    setBmr(0);
+    setBmr("0.00");
   };
 
   return (
     <>
       <div className="w-[40%] border border-gray-200 rounded-2xl shadow-xl mt-10 m-auto flex flex-col items-center p-10 bg-white">
-        <p className="font-kanit font-bold text-2xl text-gray-800">BMR Calculator</p>
-        <p className="font-kanit font-bold text-gray-400 text-sm mt-1">คำนวณ BMR</p>
+        <p className="font-kanit font-bold text-2xl text-gray-800">
+          BMR Calculator
+        </p>
+        <p className="font-kanit font-bold text-gray-400 text-sm mt-1">
+          คำนวณ BMR
+        </p>
 
         {/* รูปไอคอน */}
         <img src={bmrImg} alt="BMR" className="w-24 mt-4" />
@@ -50,37 +87,47 @@ export default function Bmr() {
         {/* ฟอร์มรับข้อมูล */}
         <form onSubmit={calculateBmr} className="w-full mt-6 flex flex-col">
           {/* ป้อนน้ำหนัก */}
-          <label className="font-kanit text-xs text-gray-500 mb-1">ป้อนน้ำหนัก (กิโลกรัม)</label>
+          <label className="font-kanit text-xs text-gray-500 mb-1">
+            ป้อนน้ำหนัก (กิโลกรัม)
+          </label>
           <input
             type="number"
+            step="any"
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
             className="border border-gray-200 rounded-md p-2 text-sm focus:outline-none focus:border-indigo-500"
-            required
+            placeholder="เช่น 65"
           />
 
           {/* ป้อนส่วนสูง */}
-          <label className="font-kanit text-xs text-gray-500 mt-3 mb-1">ป้อนส่วนสูง (เซนติเมตร)</label>
+          <label className="font-kanit text-xs text-gray-500 mt-3 mb-1">
+            ป้อนส่วนสูง (เซนติเมตร)
+          </label>
           <input
             type="number"
+            step="any"
             value={height}
             onChange={(e) => setHeight(e.target.value)}
             className="border border-gray-200 rounded-md p-2 text-sm focus:outline-none focus:border-indigo-500"
-            required
+            placeholder="เช่น 170"
           />
 
           {/* ป้อนอายุ */}
-          <label className="font-kanit text-xs text-gray-500 mt-3 mb-1">ป้อนอายุ (ปี)</label>
+          <label className="font-kanit text-xs text-gray-500 mt-3 mb-1">
+            ป้อนอายุ (ปี)
+          </label>
           <input
             type="number"
             value={age}
             onChange={(e) => setAge(e.target.value)}
             className="border border-gray-200 rounded-md p-2 text-sm focus:outline-none focus:border-indigo-500"
-            required
+            placeholder="เช่น 25"
           />
 
           {/* ตัวเลือกเพศ */}
-          <label className="font-kanit text-xs text-gray-500 mt-3 mb-1">เพศ</label>
+          <label className="font-kanit text-xs text-gray-500 mt-3 mb-1">
+            เพศ
+          </label>
           <div className="flex gap-4 items-center font-kanit text-xs text-gray-700">
             <label className="flex items-center gap-1 cursor-pointer">
               <input
@@ -124,8 +171,12 @@ export default function Bmr() {
 
         {/* ผลลัพธ์ */}
         <div className="flex justify-center items-center gap-2 mt-5 font-kanit">
-          <span className="font-bold text-gray-700 text-sm">ค่า BMR ที่คำนวณได้ :</span>
-          <span className="font-bold text-indigo-600 text-sm">{bmr} kcal/day</span>
+          <span className="font-bold text-gray-700 text-sm">
+            ค่า BMR ที่คำนวณได้ :
+          </span>
+          <span className="font-bold text-indigo-600 text-sm">
+            {bmr} kcal/day
+          </span>
         </div>
 
         {/* ลิงก์กลับหน้าหลัก */}
@@ -136,6 +187,9 @@ export default function Bmr() {
           กลับหน้าหลัก
         </Link>
       </div>
+
+      {/* footer */}
+      <Footer />
     </>
   );
 }
